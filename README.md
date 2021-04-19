@@ -1,6 +1,6 @@
-# 👷 `worker-template` Hello World
+# 👷 `Pwned Passwords Cloudflare Worker` k-point cloudflare worker
 
-A template for kick starting a Cloudflare worker project.
+Based on the template for kick starting a Cloudflare worker project.
 
 [`index.js`](https://github.com/cloudflare/worker-template/blob/master/index.js) is the content of the Workers script.
 
