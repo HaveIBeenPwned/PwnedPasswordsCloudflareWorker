@@ -9,7 +9,7 @@
     "format": "prettier --write '**/*.{js,css,json,md}'"
   },
   "author": "Sean W. Richardson <srichardson@cloudflare.com>",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "devDependencies": {
     "prettier": "^1.18.2"
   }
