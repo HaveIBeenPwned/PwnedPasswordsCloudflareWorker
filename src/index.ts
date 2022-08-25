@@ -56,10 +56,9 @@ function setCorsHeaders(headers: Headers): Headers {
 
 function padResponse(originalBody: string): string {
   let body = originalBody;
-  const minimum = 800 - originalBody.split("\n").length;
-  const random = Math.floor(200 * cryptoRandom());
+  const random = (10 + Math.floor(200 * cryptoRandom()));
 
-  for (let i = 0; i < (minimum + random); i++) {
+  for (let i = 0; i < random; i++) {
     body += "\r\n" + generateHex();
   }
 
