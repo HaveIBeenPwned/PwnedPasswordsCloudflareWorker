@@ -38,7 +38,8 @@ async function processRequest(request: Request): Promise<Response> {
   const addPaddingHeader = request.headers.get('Add-Padding');
   if (response.status === 200 && addPaddingHeader && (addPaddingHeader.toLowerCase() === "true")) {
     const originalBody = await response.text();
-    let newResponse = new Response(padResponse(originalBody));
+    const newBody = padResponse(originalBody);
+    let newResponse = new Response(newBody, response);
     newResponse.headers.set('Access-Control-Allow-Origin', '*');
     newResponse.headers.set('Cache-Control', 'public, max-age=2678400');
     return newResponse;
