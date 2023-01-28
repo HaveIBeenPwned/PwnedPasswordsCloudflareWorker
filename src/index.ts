@@ -77,16 +77,6 @@ function generateHex(isNtlm: boolean): string {
   return result + ":0";
 }
 
-function generateNtlmHex(): string {
-  let result = '';
-  const characters = '0123456789ABCDEF';
-  const charactersLength = characters.length;
-  for (var i = 0; i < 27; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result + ":0";
-}
-
 function cryptoRandom(): number {
   const array = new Uint32Array(1),
     max = Math.pow(2, 32),
