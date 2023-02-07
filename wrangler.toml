@@ -1,8 +1,3 @@
-name = "testworker"
-type = "webpack"
-
-account_id = ""
-workers_dev = true
-webpack_config = "webpack.config.js"
-route = ""
-zone_id = ""
+name = "pwnedpasswordsworker"
+main = "src/index.ts"
+compatibility_date = "2022-12-22"
