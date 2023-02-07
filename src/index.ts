@@ -42,7 +42,6 @@ async function processRequest(request: Request): Promise<Response> {
   const prefix = url.pathname.substring(7);
   const isNtlm = url.searchParams.get('mode') == 'ntlm';
   const newRequest = "https://api.pwnedpasswords.com/range/" + prefix.toUpperCase() + isNtlm ? "?mode=ntlm" : "";
-
   if (prefix === null || prefix.length !== 5) {
     const response = new Response("The hash prefix was not in a valid format", { "status": 400, "statusText": "Bad Request" });
     return response;
