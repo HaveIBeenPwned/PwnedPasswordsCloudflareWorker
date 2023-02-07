@@ -20,7 +20,8 @@ async function processRequest(request: Request): Promise<Response> {
   }
 
   const prefix = url.pathname.substr(7);
-  const newRequest = "https://api.pwnedpasswords.com/range/" + prefix.toUpperCase();
+  const isNtlm = url.searchParams.get('mode') == 'ntlm';
+  const newRequest = "https://api.pwnedpasswords.com/range/" + prefix.toUpperCase() + isNtlm ? "?mode=ntlm" : "";
 
   if (prefix === null || prefix.length !== 5) {
     const response = new Response("The hash prefix was not in a valid format", { "status": 400, "statusText": "Bad Request" });
@@ -37,7 +38,6 @@ async function processRequest(request: Request): Promise<Response> {
   const response = await fetch(request, { cf: { cacheKey: newRequest, cacheEverything: true, cacheTtlByStatus: { "300-599": -1 } } });
   const addPaddingHeader = request.headers.get('Add-Padding');
   if (response.status === 200 && addPaddingHeader && (addPaddingHeader.toLowerCase() === "true")) {
-    const isNtlm = url.searchParams.get('mode') == 'ntlm';
     const originalBody = await response.text();
     const newBody = padResponse(originalBody, isNtlm);
     let newResponse = new Response(newBody, response);
