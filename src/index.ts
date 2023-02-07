@@ -37,8 +37,9 @@ async function processRequest(request: Request): Promise<Response> {
   const response = await fetch(request, { cf: { cacheKey: newRequest, cacheEverything: true, cacheTtlByStatus: { "300-599": -1 } } });
   const addPaddingHeader = request.headers.get('Add-Padding');
   if (response.status === 200 && addPaddingHeader && (addPaddingHeader.toLowerCase() === "true")) {
+    const isNtlm = url.searchParams.get('mode') == 'ntlm';
     const originalBody = await response.text();
-    const newBody = padResponse(originalBody);
+    const newBody = padResponse(originalBody, isNtlm);
     let newResponse = new Response(newBody, response);
     newResponse.headers.set('Access-Control-Allow-Origin', '*');
     newResponse.headers.set('Cache-Control', 'public, max-age=2678400');
@@ -55,22 +56,22 @@ function setCorsHeaders(headers: Headers): Headers {
   return headers;
 }
 
-function padResponse(originalBody: string): string {
+function padResponse(originalBody: string, isNtlm: boolean): string {
   let body = originalBody;
   const random = (10 + Math.floor(200 * cryptoRandom()));
 
   for (let i = 0; i < random; i++) {
-    body += "\r\n" + generateHex();
+    body += "\r\n" + generateHex(isNtlm);
   }
 
   return body;
 }
 
-function generateHex(): string {
+function generateHex(isNtlm: boolean): string {
   let result = '';
   const characters = '0123456789ABCDEF';
   const charactersLength = characters.length;
-  for (var i = 0; i < 35; i++) {
+  for (var i = 0; i < (isNtlm ? 27 : 35); i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result + ":0";
