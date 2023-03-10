@@ -35,7 +35,12 @@ async function processRequest(request: Request): Promise<Response> {
   }
 
   if (!url.pathname.startsWith("/range/")) {
-    const response = new Response("Invalid API query", { "status": 404, "statusText": "Not Found" });
+    const response = new Response("Invalid API query", { "status": 400, "statusText": "Bad Request" });
+    return response;
+  }
+
+  if (request.method === 'POST') {
+    const response = new Response("Only GET requests can be used to query ranges, but this request used the POST verb", { "status": 400, "statusText": "Bad Request" });
     return response;
   }
 
