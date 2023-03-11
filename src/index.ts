@@ -40,7 +40,7 @@ async function processRequest(request: Request): Promise<Response> {
   }
 
   if (request.method === 'POST') {
-    const response = new Response("Only GET requests can be used to query ranges, but this request used the POST verb", { "status": 400, "statusText": "Bad Request" });
+    const response = new Response("Only GET requests can be used to query ranges, but this request used the POST verb", { "status": 405, "statusText": "Method Not Allowed" });
     return response;
   }
 
