@@ -59,17 +59,30 @@ async function processRequest(request: Request): Promise<Response> {
     return response;
   }
 
-  const response = await fetch(request, { cf: { cacheKey: newRequest, cacheEverything: true, cacheTtlByStatus: { "300-599": -1 } } });
   const addPaddingHeader = request.headers.get('Add-Padding');
-  if (response.status === 200 && addPaddingHeader && (addPaddingHeader.toLowerCase() === "true")) {
-    const originalBody = await response.text();
-    const newBody = padResponse(originalBody, isNtlm);
-    const newResponse = new Response(newBody, response);
-    newResponse.headers.set('Access-Control-Allow-Origin', '*');
-    newResponse.headers.set('Cache-Control', 'public, max-age=2678400');
-    return newResponse;
+
+  // Fetching and generating the padding in parallel
+  const [response, padding] = await Promise.all([
+	fetch(request, { cf: { cacheKey: newRequest, cacheEverything: true, cacheTtlByStatus: { "300-599": -1 } } }),
+	getPadding(addPaddingHeader, isNtlm)
+  ]);
+
+  // No magic on non 200
+  if (response.status !== 200) {
+	return response;
   }
-  return response
+
+  // No padding so just return
+  if (padding === '') {
+	return response;
+  }
+
+  const originalBody = await response.text();
+  const newBody = originalBody + padding;
+  const newResponse = new Response(newBody, response);
+  newResponse.headers.set('Access-Control-Allow-Origin', '*');
+  newResponse.headers.set('Cache-Control', 'public, max-age=2678400');
+  return newResponse;
 }
 
 function setCorsHeaders(headers: Headers): Headers {
@@ -80,15 +93,19 @@ function setCorsHeaders(headers: Headers): Headers {
   return headers
 }
 
-function padResponse(originalBody: string, isNtlm: boolean): string {
-  let body = originalBody;
-  const random = (10 + Math.floor(200 * cryptoRandom()));
-
-  for (let i = 0; i < random; i++) {
-    body += "\r\n" + generateHex(isNtlm);
+async function getPadding(addPaddingHeader: string | null, isNtlm: boolean): Promise<string> {
+  if (!addPaddingHeader || (addPaddingHeader.toLowerCase() !== "true")) {
+    return '';
   }
 
-  return body;
+  const random = (10 + Math.floor(200 * cryptoRandom()));
+
+  let padding = '';
+  for (let i = 0; i < random; i++) {
+    padding += "\r\n" + generateHex(isNtlm);
+  }
+
+  return padding;
 }
 
 function generateHex(isNtlm: boolean): string {
